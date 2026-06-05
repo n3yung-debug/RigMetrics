@@ -56,8 +56,11 @@ public class StatsCalculatorTests
 
         // The single worst frame should drag the 1% low down to ~10 FPS.
         Assert.Equal(10.0, stats.Percentile1LowFps, 1);
-        // Average FPS stays high because most frames are fast.
-        Assert.True(stats.AvgFps > 45 && stats.AvgFps < 55,
+
+        // The (time-weighted) average FPS stays high because 99% of frames are
+        // fast: 100 frames over (99*10ms + 100ms) = 1.09s => ~91.7 FPS. This is
+        // exactly why average FPS hides stutter and the 1% low does not.
+        Assert.True(stats.AvgFps > 85 && stats.AvgFps < 95,
             $"AvgFps was {stats.AvgFps}");
     }
 
