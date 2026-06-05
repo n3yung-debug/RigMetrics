@@ -51,15 +51,28 @@ the standard open-source library for reading CPU/GPU/RAM load and temperatures
 
 ---
 
-## Prerequisites
+## Easiest way to run it (no building)
+
+1. Grab the latest **`RustFpsTracker-win-x64.zip`** from the repository's
+   **Actions → release** workflow artifacts (or the **Releases** page if a
+   version tag has been published).
+2. Unzip it anywhere. The ZIP already contains **everything** — the app, the
+   .NET runtime (self-contained, no install needed), and **PresentMon**.
+3. Right-click `RustFpsTracker.exe` → **Run as administrator**.
+
+That's it — one folder, nothing else to download.
+
+> Building from source instead? See **Build & run** below. If PresentMon isn't
+> present, the app offers to download the official build automatically on first
+> Start.
+
+## Prerequisites (only if building from source)
 
 1. **Windows 10 or 11** (64-bit).
-2. **[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)** to build
-   (end users of a published build only need the app itself).
-3. **PresentMon.exe** — download the latest release from
-   [PresentMon Releases](https://github.com/GameTechDev/PresentMon/releases),
-   rename it to `PresentMon.exe`, and place it **next to the app's exe** (or set
-   `presentMonPath` in `appsettings.json`).
+2. **[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)**.
+3. **PresentMon** — bundled in the release ZIP; for source builds the app will
+   offer to fetch it for you, or you can drop `PresentMon.exe` next to the app
+   manually from [PresentMon Releases](https://github.com/GameTechDev/PresentMon/releases).
 4. Run the app **as Administrator** — required for ETW frame capture and for
    reading temperatures. (The app already requests elevation automatically.)
 

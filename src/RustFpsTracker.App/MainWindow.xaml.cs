@@ -17,6 +17,7 @@ public partial class MainWindow : Window
     private readonly HardwareMonitorService _hardware;
     private readonly RecordingService _recording;
     private readonly DispatcherTimer _uiTimer;
+    private readonly string _presentMonPath;
 
     public MainWindow()
     {
@@ -26,8 +27,9 @@ public partial class MainWindow : Window
         _config = AppConfig.Load(Path.Combine(baseDir, "appsettings.json"));
         _store = SessionStore.CreateDefault();
 
+        _presentMonPath = _config.ResolvePresentMonPath(baseDir);
         _presentMon = new PresentMonService(
-            _config.ResolvePresentMonPath(baseDir),
+            _presentMonPath,
             _config.GameProcessName,
             _config.PresentMonExtraArgs);
         _hardware = new HardwareMonitorService(_config.SensorPollMs);
@@ -47,7 +49,7 @@ public partial class MainWindow : Window
 
     // ===== Recording control =====
 
-    private void StartStopButton_Click(object sender, RoutedEventArgs e)
+    private async void StartStopButton_Click(object sender, RoutedEventArgs e)
     {
         if (_recording.IsTracking)
         {
@@ -55,12 +57,46 @@ public partial class MainWindow : Window
         }
         else
         {
-            StartTracking();
+            await StartTrackingAsync();
         }
     }
 
-    private void StartTracking()
+    private async Task StartTrackingAsync()
     {
+        // PresentMon is bundled in the release ZIP. If it is missing (e.g. a
+        // build from source), offer to fetch it automatically.
+        if (!PresentMonProvider.Exists(_presentMonPath))
+        {
+            var choice = MessageBox.Show(this,
+                "PresentMon is required to measure FPS and was not found.\n\n" +
+                "Download the official PresentMon now? (~a few MB, one time)",
+                "Download PresentMon", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (choice != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                StartStopButton.IsEnabled = false;
+                System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                var progress = new Progress<string>(msg => StatusText.Text = msg);
+                await PresentMonProvider.EnsureAsync(_presentMonPath, progress);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    "Could not download PresentMon automatically:\n\n" + ex.Message +
+                    "\n\nDownload it from https://github.com/GameTechDev/PresentMon/releases " +
+                    "and place PresentMon.exe next to this app.",
+                    "Download failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            finally
+            {
+                System.Windows.Input.Mouse.OverrideCursor = null;
+                StartStopButton.IsEnabled = true;
+            }
+        }
+
         var label = string.IsNullOrWhiteSpace(LabelBox.Text)
             ? $"Session {DateTime.Now:yyyy-MM-dd HH:mm}"
             : LabelBox.Text.Trim();
