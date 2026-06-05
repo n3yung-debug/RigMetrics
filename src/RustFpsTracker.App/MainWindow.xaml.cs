@@ -202,6 +202,12 @@ public partial class MainWindow : Window
         StatusText.Text = $"Exported frames + sensors to {Path.GetDirectoryName(dialog.FileName)}";
     }
 
+    private void Results_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new ResultsWindow(_store) { Owner = this };
+        window.ShowDialog();
+    }
+
     private void Compare_Click(object sender, RoutedEventArgs e)
     {
         var selected = SelectedSessions();

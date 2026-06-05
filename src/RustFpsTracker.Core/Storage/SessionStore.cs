@@ -18,6 +18,9 @@ public sealed class SessionStore
 
     public string Directory { get; }
 
+    /// <summary>Running master spreadsheet that accumulates one row per session.</summary>
+    public string MasterCsvPath => Path.Combine(Directory, "results-master.csv");
+
     public SessionStore(string directory)
     {
         Directory = directory;

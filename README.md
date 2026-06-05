@@ -128,6 +128,38 @@ live numbers while you play.
 Sessions are stored as JSON in
 `%AppData%\RustFpsTracker\sessions`.
 
+## Tracking results over time (and Google Sheets)
+
+Every time you stop a session, its summary is automatically appended to a
+running master spreadsheet:
+
+```
+%AppData%\RustFpsTracker\sessions\results-master.csv
+```
+
+Click **Results / Sheets** in the app to open a sortable table of every session
+(avg, 1% / 0.1% low, frame-time consistency, stutters, CPU/GPU temps, etc.).
+From there you can:
+
+- **Export CSV** &mdash; a consolidated file of all results.
+- **Export Excel (.xlsx)** &mdash; a formatted workbook.
+- **Open master file** &mdash; the always-up-to-date running log.
+
+### Getting it into Google Sheets
+
+Both exports drop straight into Google Sheets &mdash; no account linking needed:
+
+1. In Google Sheets: **File → Import → Upload**, and choose the exported
+   `.csv` or `.xlsx`.
+2. Or simply open the `.xlsx` from Google Drive.
+
+> A direct "log in with Google and auto-push" integration was intentionally
+> left out: it would require every user to set up their own Google Cloud OAuth
+> client, since OAuth credentials can't be safely shipped inside a downloadable
+> app. The import-a-file route above is instant and works for everyone. (If you
+> later want the live-sync version, it can be added &mdash; it just needs that
+> one-time OAuth client setup.)
+
 ---
 
 ## Configuration (`appsettings.json`)

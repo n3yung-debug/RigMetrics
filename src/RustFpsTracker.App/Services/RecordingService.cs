@@ -1,3 +1,4 @@
+using RustFpsTracker.Core.Export;
 using RustFpsTracker.Core.Models;
 using RustFpsTracker.Core.Stats;
 using RustFpsTracker.Core.Storage;
@@ -106,6 +107,8 @@ public sealed class RecordingService : IDisposable
         try
         {
             _store.Save(session);
+            // Keep the running master results spreadsheet up to date.
+            ResultsExporter.AppendToMaster(SessionSummaryRow.From(session), _store.MasterCsvPath);
         }
         catch (Exception ex)
         {
