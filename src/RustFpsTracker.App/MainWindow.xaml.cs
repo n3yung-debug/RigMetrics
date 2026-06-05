@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     private readonly RecordingService _recording;
     private readonly DispatcherTimer _uiTimer;
     private readonly string _presentMonPath;
+    private readonly UserPreferences _prefs;
 
     public MainWindow()
     {
@@ -26,6 +27,7 @@ public partial class MainWindow : Window
         var baseDir = AppContext.BaseDirectory;
         _config = AppConfig.Load(Path.Combine(baseDir, "appsettings.json"));
         _store = SessionStore.CreateDefault();
+        _prefs = UserPreferences.Load();
 
         _presentMonPath = _config.ResolvePresentMonPath(baseDir);
         _presentMon = new PresentMonService(
@@ -43,8 +45,36 @@ public partial class MainWindow : Window
         _uiTimer.Tick += (_, _) => RefreshLive();
         _uiTimer.Start();
 
+        // Populate the game picker, defaulting to the last tracked game (or config).
+        var initialTarget = string.IsNullOrWhiteSpace(_prefs.LastGameProcessName)
+            ? _config.GameProcessName
+            : _prefs.LastGameProcessName;
+        PopulateTargets(initialTarget);
+
         LoadSessions();
         Closed += OnClosed;
+    }
+
+    // ===== Game target picker =====
+
+    private void TargetCombo_DropDownOpened(object sender, EventArgs e)
+        => PopulateTargets(TargetCombo.Text);
+
+    private void PopulateTargets(string? keepSelection)
+    {
+        var apps = ProcessLister.ListWindowedApps().ToList();
+        var current = string.IsNullOrWhiteSpace(keepSelection) ? TargetCombo.Text : keepSelection;
+
+        // Make sure the current/last choice is always selectable even if not running.
+        if (!string.IsNullOrWhiteSpace(current)
+            && !apps.Contains(current, StringComparer.OrdinalIgnoreCase))
+        {
+            apps.Insert(0, current);
+        }
+
+        TargetCombo.ItemsSource = apps;
+        if (!string.IsNullOrWhiteSpace(current))
+            TargetCombo.Text = current;
     }
 
     // ===== Recording control =====
@@ -63,6 +93,20 @@ public partial class MainWindow : Window
 
     private async Task StartTrackingAsync()
     {
+        // Resolve which game/app to track from the picker (dropdown or typed name).
+        var target = (TargetCombo.Text ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(target))
+        {
+            MessageBox.Show(this,
+                "Choose a game to track (pick a running app from the list, or type its .exe name, e.g. cs2.exe).",
+                "No game selected", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        _presentMon.ProcessName = target;
+        _config.GameProcessName = target;
+        _prefs.LastGameProcessName = target;
+        _prefs.Save();
+
         // PresentMon is bundled in the release ZIP. If it is missing (e.g. a
         // build from source), offer to fetch it automatically.
         if (!PresentMonProvider.Exists(_presentMonPath))
@@ -110,7 +154,7 @@ public partial class MainWindow : Window
         }
 
         StartStopButton.Content = "Stop";
-        StatusText.Text = $"Tracking \"{label}\" - play Rust now. Stop when done.";
+        StatusText.Text = $"Tracking \"{label}\" on {target} - play now. Stop when done.";
     }
 
     private void StopTracking()
@@ -126,7 +170,8 @@ public partial class MainWindow : Window
         }
         else
         {
-            StatusText.Text = "Stopped. No frames were captured - is Rust running and PresentMon present?";
+            StatusText.Text =
+                $"Stopped. No frames captured - is {_config.GameProcessName} running, and was the app started as Administrator?";
         }
         LoadSessions();
     }

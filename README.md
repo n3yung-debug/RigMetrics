@@ -112,19 +112,26 @@ detection) and the PresentMon CSV parser, and run on any OS.
 
 ## How to use it
 
-1. Launch Rust.
+1. Launch your game (Rust or anything else).
 2. Launch **Rust FPS Tracker** (as Administrator).
-3. Type a **label** describing your current settings, e.g. `Shadows Low, AA Off`.
-4. Press **Start**, play for a consistent test (same spot/activity works best),
+3. Pick the **Game** from the dropdown (it lists running apps), or type its
+   process name, e.g. `cs2.exe`. Your choice is remembered next time.
+4. Type a **label** describing your current settings, e.g. `Shadows Low, AA Off`.
+5. Press **Start**, play for a consistent test (same spot/activity works best),
    then press **Stop**. The session is saved automatically.
-5. Change one setting in Rust, then repeat with a new label.
-6. Select **two** saved sessions and click **Compare 2** to see which settings
+6. Change one setting in the game, then repeat with a new label.
+7. Select **two** saved sessions and click **Compare 2** to see which settings
    helped — green deltas are improvements.
-7. **Export report** writes a single Excel workbook for the selected session
+8. **Export report** writes a single Excel workbook for the selected session
    (see below).
 
 Tip: enable **Always on top** and drag the window to a second monitor to watch
 live numbers while you play.
+
+> **Works with any game**, not just Rust. FPS is captured for whichever process
+> you select in the **Game** dropdown; CPU/GPU/RAM load and temperatures are
+> whole-system. Find a game's process name in **Task Manager → Details** if it
+> isn't in the list.
 
 Sessions are stored as JSON in
 `%AppData%\RustFpsTracker\sessions`.

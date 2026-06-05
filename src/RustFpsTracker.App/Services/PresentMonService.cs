@@ -16,17 +16,22 @@ namespace RustFpsTracker.App.Services;
 public sealed class PresentMonService : IDisposable
 {
     private readonly string _exePath;
-    private readonly string _processName;
     private readonly string[] _extraArgs;
     private readonly PresentMonCsvParser _parser = new();
     private readonly object _gate = new();
 
     private Process? _process;
 
+    /// <summary>
+    /// The executable name of the game/app to track (e.g. "RustClient.exe").
+    /// Settable while idle so the user can switch targets between sessions.
+    /// </summary>
+    public string ProcessName { get; set; }
+
     public PresentMonService(string exePath, string processName, string[] extraArgs)
     {
         _exePath = exePath;
-        _processName = processName;
+        ProcessName = processName;
         _extraArgs = extraArgs;
     }
 
@@ -116,7 +121,7 @@ public sealed class PresentMonService : IDisposable
         // --terminate_on_proc_exit: exit when the game closes
         var args = new List<string>
         {
-            "--process_name", _processName,
+            "--process_name", ProcessName,
             "--output_stdout",
             "--stop_existing_session",
             "--terminate_on_proc_exit",
@@ -141,7 +146,7 @@ public sealed class PresentMonService : IDisposable
             // Only forward frames belonging to the target game.
             if (sample is null) return;
             if (app is not null &&
-                !string.Equals(app, _processName, StringComparison.OrdinalIgnoreCase))
+                !string.Equals(app, ProcessName, StringComparison.OrdinalIgnoreCase))
                 return;
 
             FrameCaptured?.Invoke(sample);

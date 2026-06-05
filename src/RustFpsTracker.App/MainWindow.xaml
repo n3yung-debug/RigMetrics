@@ -20,6 +20,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -29,10 +30,18 @@
                     <TextBlock Text="RUST FPS TRACKER" FontSize="16" FontWeight="Bold"
                                Foreground="{StaticResource AccentBrush}" />
                     <TextBlock x:Name="StatusText" Style="{StaticResource StatLabel}"
-                               Text="Idle. Enter a label and press Start." />
+                               Text="Idle. Pick a game, enter a label, press Start." />
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Vertical" Margin="20,0"
+                <StackPanel Grid.Column="1" Orientation="Vertical" Margin="20,0,0,0"
+                            VerticalAlignment="Center" Width="200">
+                    <TextBlock Text="GAME (process to track)" Style="{StaticResource StatLabel}" />
+                    <ComboBox x:Name="TargetCombo" Margin="0,2,0,0" IsEditable="True"
+                              DropDownOpened="TargetCombo_DropDownOpened"
+                              ToolTip="Choose a running game, or type its .exe name (e.g. cs2.exe)." />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Vertical" Margin="16,0"
                             VerticalAlignment="Center">
                     <TextBlock Text="SESSION LABEL (e.g. 'Shadows Low, AA Off')"
                                Style="{StaticResource StatLabel}" />
@@ -41,12 +50,12 @@
                              BorderBrush="#FF3A3C44" />
                 </StackPanel>
 
-                <CheckBox x:Name="TopmostCheck" Grid.Column="2" Content="Always on top"
+                <CheckBox x:Name="TopmostCheck" Grid.Column="3" Content="Always on top"
                           Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"
                           Margin="0,0,16,0" Checked="TopmostCheck_Changed"
                           Unchecked="TopmostCheck_Changed" />
 
-                <Button x:Name="StartStopButton" Grid.Column="3" Content="Start"
+                <Button x:Name="StartStopButton" Grid.Column="4" Content="Start"
                         MinWidth="110" Click="StartStopButton_Click" VerticalAlignment="Center" />
             </Grid>
         </Border>
