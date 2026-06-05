@@ -120,13 +120,35 @@ detection) and the PresentMon CSV parser, and run on any OS.
 5. Change one setting in Rust, then repeat with a new label.
 6. Select **two** saved sessions and click **Compare 2** to see which settings
    helped — green deltas are improvements.
-7. **Export CSV** writes per-frame and per-second data for Excel.
+7. **Export report** writes a single Excel workbook for the selected session
+   (see below).
 
 Tip: enable **Always on top** and drag the window to a second monitor to watch
 live numbers while you play.
 
 Sessions are stored as JSON in
 `%AppData%\RustFpsTracker\sessions`.
+
+## Per-session report (Export report)
+
+Selecting a session and clicking **Export report** writes one Excel workbook
+(`<label>_report.xlsx`) with three sheets:
+
+- **Summary** &mdash; whole-test averages: FPS (avg, 1% / 0.1% low, min/max,
+  frame-time, stutters, dropped frames) and sensors (avg CPU/GPU/RAM load,
+  avg + max CPU/GPU temps). No memory-used amounts.
+- **FPS over time** &mdash; time buckets of **5 minutes**, automatically
+  dropping to **30 seconds** whenever frames are dropped, and staying fine
+  until **60 seconds** pass with no drops (then back to 5 minutes). Buckets
+  with drops are highlighted.
+- **Sensors over time** &mdash; the same adaptive buckets, but the trigger is
+  **dangerous temperatures** (defaults: CPU &ge; 90 &deg;C, GPU &ge; 85 &deg;C).
+  It samples every 30 seconds until temperatures **stabilize** (cool ~5 &deg;C
+  below the threshold), then returns to 5-minute buckets. Loads and temps only.
+
+All thresholds and bucket sizes are configurable in `appsettings.json`
+(`reportCoarseMinutes`, `reportFineSeconds`, `reportDropHoldSeconds`,
+`reportCpuDangerC`, `reportGpuDangerC`, `reportStabilizeMarginC`).
 
 ## Tracking results over time (and Google Sheets)
 

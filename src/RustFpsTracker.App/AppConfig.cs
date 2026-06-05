@@ -27,6 +27,37 @@ public sealed class AppConfig
     /// <summary>Rolling window (seconds) used for the live on-screen statistics.</summary>
     public int LiveWindowSeconds { get; set; } = 60;
 
+    // ----- Per-session report (combined FPS + sensors export) -----
+
+    /// <summary>Normal report bucket size, in minutes.</summary>
+    public double ReportCoarseMinutes { get; set; } = 5;
+
+    /// <summary>Fine report bucket size, in seconds (used during drops / dangerous temps).</summary>
+    public double ReportFineSeconds { get; set; } = 30;
+
+    /// <summary>After a dropped frame, stay at fine resolution until this many seconds with no drops.</summary>
+    public double ReportDropHoldSeconds { get; set; } = 60;
+
+    /// <summary>CPU temperature (C) considered dangerous (switches sensors to fine resolution).</summary>
+    public double ReportCpuDangerC { get; set; } = 90;
+
+    /// <summary>GPU temperature (C) considered dangerous.</summary>
+    public double ReportGpuDangerC { get; set; } = 85;
+
+    /// <summary>How many degrees below the danger threshold counts as "stabilized".</summary>
+    public double ReportStabilizeMarginC { get; set; } = 5;
+
+    public RustFpsTracker.Core.Export.ReportOptions BuildReportOptions() => new()
+    {
+        CoarseSeconds = ReportCoarseMinutes * 60,
+        FineSeconds = ReportFineSeconds,
+        DropHoldSeconds = ReportDropHoldSeconds,
+        CpuDangerC = ReportCpuDangerC,
+        GpuDangerC = ReportGpuDangerC,
+        CpuStableC = ReportCpuDangerC - ReportStabilizeMarginC,
+        GpuStableC = ReportGpuDangerC - ReportStabilizeMarginC,
+    };
+
     private static readonly JsonSerializerOptions Options = new()
     {
         PropertyNameCaseInsensitive = true,

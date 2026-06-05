@@ -173,33 +173,29 @@ public partial class MainWindow : Window
     private List<SessionRecording> SelectedSessions()
         => SessionsList.SelectedItems.Cast<SessionRecording>().ToList();
 
-    private void ExportCsv_Click(object sender, RoutedEventArgs e)
+    private void ExportReport_Click(object sender, RoutedEventArgs e)
     {
         var selected = SelectedSessions();
         if (selected.Count == 0)
         {
-            MessageBox.Show(this, "Select a session to export.", "Export CSV");
+            MessageBox.Show(this, "Select a session to export.", "Export report");
             return;
         }
 
         var session = selected[0];
         var dialog = new SaveFileDialog
         {
-            Title = "Export session frames",
-            FileName = SanitizeFileName(session.Label) + "_frames.csv",
-            Filter = "CSV files (*.csv)|*.csv",
+            Title = "Export session report",
+            FileName = SanitizeFileName(session.Label) + "_report.xlsx",
+            Filter = "Excel workbook (*.xlsx)|*.xlsx",
         };
         if (dialog.ShowDialog(this) != true) return;
 
-        SessionStore.ExportFramesCsv(session, dialog.FileName);
+        // One workbook: Summary + FPS over time + Sensors over time, with
+        // adaptive 5-min / 30-s bucketing on drops and dangerous temps.
+        SessionReportXlsxExporter.Export(session, _config.BuildReportOptions(), dialog.FileName);
 
-        // Also export the sensor log alongside it.
-        var sensorsPath = Path.Combine(
-            Path.GetDirectoryName(dialog.FileName)!,
-            Path.GetFileNameWithoutExtension(dialog.FileName) + "_sensors.csv");
-        SessionStore.ExportSensorsCsv(session, sensorsPath);
-
-        StatusText.Text = $"Exported frames + sensors to {Path.GetDirectoryName(dialog.FileName)}";
+        StatusText.Text = $"Exported report to {dialog.FileName}";
     }
 
     private void Results_Click(object sender, RoutedEventArgs e)
