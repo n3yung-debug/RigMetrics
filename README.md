@@ -1,9 +1,10 @@
-# Rust FPS Tracker
+# RigMetrics
 
-A Windows desktop app for measuring **FPS and frame consistency** in the Steam
-game **Rust**, alongside **CPU / GPU / RAM usage and temperatures**. It's built
-to answer one question: *which of my settings changes actually give me the most
-FPS and the smoothest experience?*
+A Windows desktop app for measuring **FPS and frame consistency** in any game
+(originally built for **Rust**), alongside **CPU / GPU / RAM usage and
+temperatures** — your whole rig's metrics in one place. It's built to answer one
+question: *which of my settings changes actually give me the most FPS and the
+smoothest experience?*
 
 Record a session, change a setting, record another, and compare them side by
 side.
@@ -53,12 +54,12 @@ the standard open-source library for reading CPU/GPU/RAM load and temperatures
 
 ## Easiest way to run it (no building)
 
-1. Grab the latest **`RustFpsTracker-win-x64.zip`** from the repository's
+1. Grab the latest **`RigMetrics-win-x64.zip`** from the repository's
    **Actions → release** workflow artifacts (or the **Releases** page if a
    version tag has been published).
 2. Unzip it anywhere. The ZIP already contains **everything** — the app, the
    .NET runtime (self-contained, no install needed), and **PresentMon**.
-3. Right-click `RustFpsTracker.exe` → **Run as administrator**.
+3. Right-click `RigMetrics.exe` → **Run as administrator**.
 
 That's it — one folder, nothing else to download.
 
@@ -82,21 +83,21 @@ That's it — one folder, nothing else to download.
 
 ```powershell
 # from the repository root
-dotnet build RustFpsTracker.sln -c Release
+dotnet build RigMetrics.sln -c Release
 
 # run it (will prompt for Administrator elevation)
-dotnet run --project src/RustFpsTracker.App -c Release
+dotnet run --project src/RigMetrics.App -c Release
 ```
 
 ### Make a single portable .exe
 
 ```powershell
-dotnet publish src/RustFpsTracker.App -c Release -r win-x64 --self-contained `
+dotnet publish src/RigMetrics.App -c Release -r win-x64 --self-contained `
   -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 ```
 
 The output lands in
-`src/RustFpsTracker.App/bin/Release/net8.0-windows/win-x64/publish/`.
+`src/RigMetrics.App/bin/Release/net8.0-windows/win-x64/publish/`.
 Copy that folder (plus `PresentMon.exe`) to any PC — no .NET install needed.
 
 ### Run the tests
@@ -113,7 +114,7 @@ detection) and the PresentMon CSV parser, and run on any OS.
 ## How to use it
 
 1. Launch your game (Rust or anything else).
-2. Launch **Rust FPS Tracker** (as Administrator).
+2. Launch **RigMetrics** (as Administrator).
 3. Pick the **Game** from the dropdown (it lists running apps), or type its
    process name, e.g. `cs2.exe`. Your choice is remembered next time.
 4. Type a **label** describing your current settings, e.g. `Shadows Low, AA Off`.
@@ -134,7 +135,7 @@ live numbers while you play.
 > isn't in the list.
 
 Sessions are stored as JSON in
-`%AppData%\RustFpsTracker\sessions`.
+`%AppData%\RigMetrics\sessions`.
 
 ## Per-session report (Export report)
 
@@ -163,7 +164,7 @@ Every time you stop a session, its summary is automatically appended to a
 running master spreadsheet:
 
 ```
-%AppData%\RustFpsTracker\sessions\results-master.csv
+%AppData%\RigMetrics\sessions\results-master.csv
 ```
 
 Click **Results / Sheets** in the app to open a sortable table of every session
@@ -214,10 +215,10 @@ Both exports drop straight into Google Sheets &mdash; no account linking needed:
 
 ```
 src/
-  RustFpsTracker.Core/   Cross-platform engine: models, stats, CSV parser, storage (unit-tested)
-  RustFpsTracker.App/    WPF dashboard, PresentMon + hardware services
+  RigMetrics.Core/   Cross-platform engine: models, stats, CSV parser, storage (unit-tested)
+  RigMetrics.App/    WPF dashboard, PresentMon + hardware services
 tests/
-  RustFpsTracker.Core.Tests/  xUnit tests for the engine
+  RigMetrics.Core.Tests/  xUnit tests for the engine
 ```
 
 ---

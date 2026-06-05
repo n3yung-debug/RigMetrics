@@ -1,4 +1,4 @@
-Rust FPS Tracker - Third-Party Notices
+RigMetrics - Third-Party Notices
 ======================================
 
 This application bundles and/or depends on the following third-party

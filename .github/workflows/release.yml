@@ -29,11 +29,11 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Test
-        run: dotnet test tests/RustFpsTracker.Core.Tests/RustFpsTracker.Core.Tests.csproj -c Release
+        run: dotnet test tests/RigMetrics.Core.Tests/RigMetrics.Core.Tests.csproj -c Release
 
       - name: Publish self-contained single-file app
         run: >
-          dotnet publish src/RustFpsTracker.App/RustFpsTracker.App.csproj
+          dotnet publish src/RigMetrics.App/RigMetrics.App.csproj
           -c Release -r win-x64 --self-contained true
           -p:PublishSingleFile=true
           -p:IncludeNativeLibrariesForSelfExtract=true
@@ -60,13 +60,13 @@ jobs:
 
       - name: Create ZIP
         shell: pwsh
-        run: Compress-Archive -Path publish/* -DestinationPath RustFpsTracker-win-x64.zip -Force
+        run: Compress-Archive -Path publish/* -DestinationPath RigMetrics-win-x64.zip -Force
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RustFpsTracker-win-x64
-          path: RustFpsTracker-win-x64.zip
+          name: RigMetrics-win-x64
+          path: RigMetrics-win-x64.zip
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -75,6 +75,6 @@ jobs:
           # On a tag push use the pushed tag; on manual run use the version input.
           # When the tag does not exist yet, the action creates it at this commit.
           tag_name: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
-          name: Rust FPS Tracker ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
-          files: RustFpsTracker-win-x64.zip
+          name: RigMetrics ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+          files: RigMetrics-win-x64.zip
           generate_release_notes: true

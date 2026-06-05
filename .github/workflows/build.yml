@@ -19,10 +19,10 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore
-        run: dotnet restore RustFpsTracker.sln
+        run: dotnet restore RigMetrics.sln
 
       - name: Build
-        run: dotnet build RustFpsTracker.sln --configuration Release --no-restore
+        run: dotnet build RigMetrics.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test tests/RustFpsTracker.Core.Tests/RustFpsTracker.Core.Tests.csproj --configuration Release --no-build
+        run: dotnet test tests/RigMetrics.Core.Tests/RigMetrics.Core.Tests.csproj --configuration Release --no-build
