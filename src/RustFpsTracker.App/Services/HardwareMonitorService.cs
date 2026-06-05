@@ -15,7 +15,6 @@ public sealed class HardwareMonitorService : IDisposable
     private readonly int _pollMs;
     private readonly object _gate = new();
     private bool _opened;
-    private bool _polling;
 
     public HardwareMonitorService(int pollMs)
     {
