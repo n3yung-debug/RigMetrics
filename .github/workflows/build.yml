@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build-and-test:
+    # Windows is required because the app project targets WPF (net8.0-windows).
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore RustFpsTracker.sln
+
+      - name: Build
+        run: dotnet build RustFpsTracker.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/RustFpsTracker.Core.Tests/RustFpsTracker.Core.Tests.csproj --configuration Release --no-build

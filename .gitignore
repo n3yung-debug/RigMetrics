@@ -1,0 +1,21 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+publish/
+*.user
+
+# Rider / VS
+.vs/
+.idea/
+*.suo
+
+# PresentMon binary is downloaded by the user, not committed
+PresentMon*.exe
+
+# OS
+Thumbs.db
+.DS_Store
