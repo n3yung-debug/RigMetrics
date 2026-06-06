@@ -63,7 +63,9 @@
         <!-- ===== Live FPS stat tiles ===== -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.6*" />
+                <ColumnDefinition Width="1.4*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -107,6 +109,22 @@
                     <TextBlock Text="FRAME TIME" Style="{StaticResource StatLabel}" />
                     <TextBlock x:Name="FrameTimeText" Text="--" Style="{StaticResource StatValue}" />
                     <TextBlock x:Name="FrameCountText" Style="{StaticResource StatLabel}" Text="0 frames" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="5" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="CPU TEMP" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="CpuTempTileText" Text="--" Style="{StaticResource StatValue}"
+                               Foreground="{StaticResource GoodBrush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="6" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="GPU TEMP" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="GpuTempTileText" Text="--" Style="{StaticResource StatValue}"
+                               Foreground="{StaticResource GoodBrush}" />
                 </StackPanel>
             </Border>
         </Grid>

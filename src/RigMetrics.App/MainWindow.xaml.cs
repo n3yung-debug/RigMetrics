@@ -203,6 +203,23 @@ public partial class MainWindow : Window
         GpuMemText.Text = "VRAM: " + Fmt(hw?.GpuMemUsedMb, "0", " MB");
         RamUsedText.Text = Fmt(hw?.RamUsedGb, "0.0", " GB");
         RamLoadText.Text = Fmt(hw?.RamLoadPercent, "0", " %");
+
+        // Prominent temperature tiles, coloured by how hot they are.
+        UpdateTempTile(CpuTempTileText, hw?.CpuTempC, _config.ReportCpuDangerC);
+        UpdateTempTile(GpuTempTileText, hw?.GpuTempC, _config.ReportGpuDangerC);
+    }
+
+    private void UpdateTempTile(System.Windows.Controls.TextBlock tile, double? tempC, double dangerC)
+    {
+        tile.Text = tempC.HasValue ? $"{tempC.Value:0} °C" : "--";
+
+        var brushKey = "GoodBrush";
+        if (tempC is { } t)
+        {
+            if (t >= dangerC) brushKey = "BadBrush";
+            else if (t >= dangerC - 10) brushKey = "WarnBrush";
+        }
+        tile.Foreground = (System.Windows.Media.Brush)FindResource(brushKey);
     }
 
     private static string Fmt(double? value, string format, string suffix)
