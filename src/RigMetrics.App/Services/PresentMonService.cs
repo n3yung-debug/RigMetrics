@@ -11,7 +11,7 @@ namespace RigMetrics.App.Services;
 ///
 /// PresentMon reads frame-presentation timings through ETW at the OS level and
 /// never injects into the game, which is why this approach is safe to use with
-/// Easy Anti-Cheat (Rust). See the README for details.
+/// kernel-level anti-cheat (e.g. Easy Anti-Cheat, BattlEye). See the README.
 /// </summary>
 public sealed class PresentMonService : IDisposable
 {
@@ -23,7 +23,7 @@ public sealed class PresentMonService : IDisposable
     private Process? _process;
 
     /// <summary>
-    /// The executable name of the game/app to track (e.g. "RustClient.exe").
+    /// The executable name of the game/app to track (e.g. "cs2.exe").
     /// Settable while idle so the user can switch targets between sessions.
     /// </summary>
     public string ProcessName { get; set; }

@@ -12,7 +12,10 @@ public sealed class AppConfig
     /// <summary>Path to PresentMon.exe. Relative paths resolve next to this app.</summary>
     public string PresentMonPath { get; set; } = "PresentMon.exe";
 
-    /// <summary>The game's process name. Rust's client process is "RustClient.exe".</summary>
+    /// <summary>
+    /// Default process to track; pre-fills the in-app Game picker. Any game
+    /// works &mdash; pick it in the app or change this (e.g. "cs2.exe").
+    /// </summary>
     public string GameProcessName { get; set; } = "RustClient.exe";
 
     /// <summary>Extra command-line args appended to the PresentMon invocation.</summary>

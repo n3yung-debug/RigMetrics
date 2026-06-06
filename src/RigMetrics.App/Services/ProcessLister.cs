@@ -5,7 +5,7 @@ namespace RigMetrics.App.Services;
 /// <summary>
 /// Lists running applications that are plausible capture targets &mdash; i.e.
 /// processes that own a visible window. Returns executable names like
-/// "RustClient.exe" suitable for PresentMon's --process_name.
+/// "cs2.exe" suitable for PresentMon's --process_name.
 /// </summary>
 public static class ProcessLister
 {

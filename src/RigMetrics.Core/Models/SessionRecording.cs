@@ -15,7 +15,8 @@ public sealed class SessionRecording
     /// <summary>Free-form notes about the settings/hardware for this run.</summary>
     public string Notes { get; set; } = "";
 
-    public string GameProcessName { get; set; } = "RustClient.exe";
+    /// <summary>Process that was tracked for this session (e.g. "cs2.exe").</summary>
+    public string GameProcessName { get; set; } = "";
 
     public DateTime StartedUtc { get; set; }
     public DateTime? EndedUtc { get; set; }

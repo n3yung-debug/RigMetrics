@@ -1,10 +1,9 @@
 # RigMetrics
 
-A Windows desktop app for measuring **FPS and frame consistency** in any game
-(originally built for **Rust**), alongside **CPU / GPU / RAM usage and
-temperatures** — your whole rig's metrics in one place. It's built to answer one
-question: *which of my settings changes actually give me the most FPS and the
-smoothest experience?*
+A Windows desktop app for measuring **FPS and frame consistency** in any game,
+alongside **CPU / GPU / RAM usage and temperatures** — your whole rig's metrics
+in one place. It's built to answer one question: *which of my settings changes
+actually give me the most FPS and the smoothest experience?*
 
 Record a session, change a setting, record another, and compare them side by
 side.
@@ -13,23 +12,41 @@ side.
 
 ## How it measures FPS (and why it's anti-cheat safe)
 
-Rust runs **Easy Anti-Cheat (EAC)**. Many FPS overlays work by *injecting* code
-into the game (like the Steam or Discord overlay). That carries a ban risk, so
-this tool **does not** do that.
+Many FPS overlays work by *injecting* code into the game (like the Steam or
+Discord overlay). Injection is exactly what anti-cheats look for, so it carries
+a ban risk — **RigMetrics never does this.**
 
 Instead it uses **[Intel PresentMon](https://github.com/GameTechDev/PresentMon)**,
 which reads frame-presentation timings through **ETW (Event Tracing for
-Windows)** at the operating-system level. It never touches Rust's memory, so it
-is safe to use with EAC and works for any DirectX/Vulkan game.
+Windows)** at the operating-system level. It never reads or writes the game's
+memory and never loads anything into the game, so it works for any
+DirectX/Vulkan/OpenGL title and does **not** interfere with kernel-level
+anti-cheats, including:
+
+- **Easy Anti-Cheat (EAC)** — e.g. Rust, Apex Legends, Fortnite
+- **BattlEye** — e.g. PUBG, Rainbow Six Siege, DayZ
+- **Valve Anti-Cheat (VAC)** — e.g. CS2, Dota 2
+- **Denuvo Anti-Cheat**, **FACEIT / ESEA**, and similar
+
+It uses the same non-invasive technique as tools like CapFrameX, PresentMon, and
+NVIDIA FrameView.
 
 Hardware sensors come from
 **[LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor)**,
 the standard open-source library for reading CPU/GPU/RAM load and temperatures
-(Intel, AMD, and NVIDIA).
+(Intel, AMD, NVIDIA) — the same kind of read-only sensor access used by HWiNFO
+and MSI Afterburner.
 
-> **Disclaimer:** This tool only *reads* publicly available OS telemetry and
-> never modifies the game. It is, to the best of our knowledge, safe to use with
-> EAC, but you use it at your own risk.
+> **Disclaimer:** RigMetrics only *reads* OS-level telemetry and sensors and
+> never modifies or injects into any game. To the best of our knowledge it is
+> safe with the anti-cheats above, but you use it at your own risk.
+>
+> **One caveat:** reading temperatures requires a small signed kernel driver
+> (loaded by LibreHardwareMonitor — again, not injected into the game). The
+> strictest boot-time anti-cheats, **most notably Riot Vanguard (Valorant)**,
+> may block third-party kernel drivers. If you play a Vanguard-protected game,
+> **FPS capture still works**, but temperatures may be unavailable. EAC,
+> BattlEye, and VAC titles are unaffected.
 
 ---
 
@@ -113,7 +130,7 @@ detection) and the PresentMon CSV parser, and run on any OS.
 
 ## How to use it
 
-1. Launch your game (Rust or anything else).
+1. Launch your game.
 2. Launch **RigMetrics** (as Administrator).
 3. Pick the **Game** from the dropdown (it lists running apps), or type its
    process name, e.g. `cs2.exe`. Your choice is remembered next time.
@@ -129,7 +146,7 @@ detection) and the PresentMon CSV parser, and run on any OS.
 Tip: enable **Always on top** and drag the window to a second monitor to watch
 live numbers while you play.
 
-> **Works with any game**, not just Rust. FPS is captured for whichever process
+> **Works with any game.** FPS is captured for whichever process
 > you select in the **Game** dropdown; CPU/GPU/RAM load and temperatures are
 > whole-system. Find a game's process name in **Task Manager → Details** if it
 > isn't in the list.
@@ -197,7 +214,7 @@ Both exports drop straight into Google Sheets &mdash; no account linking needed:
 ```json
 {
   "presentMonPath": "PresentMon.exe",   // path to PresentMon (relative = next to the app)
-  "gameProcessName": "RustClient.exe",  // Rust's process; change to profile another game
+  "gameProcessName": "RustClient.exe",  // default target; pick any game in-app (e.g. cs2.exe)
   "presentMonExtraArgs": [],            // extra PresentMon CLI flags, if needed
   "sensorPollMs": 1000,                 // how often hardware sensors are read
   "stutterMultiplier": 2.0,             // frame counts as a stutter above N x median frame time
@@ -225,9 +242,9 @@ tests/
 
 ## Ideas for later
 
-- Auto-detect when Rust launches and start/stop on its own
+- Auto-detect when a game launches and start/stop on its own
 - Per-second timeline charts in the saved report (not just live)
-- Tag sessions with the actual Rust config file so changes are captured automatically
+- Tag sessions with the game's config file so changes are captured automatically
 - Thermal-throttle warnings
 - Overlay via a second-monitor borderless window (still injection-free)
 ```

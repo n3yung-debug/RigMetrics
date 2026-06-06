@@ -18,10 +18,10 @@ public class PresentMonCsvParserTests
         Assert.True(parser.CanProduceFrameTimes);
 
         const string row =
-            "RustClient.exe,1234,0xABCD,DXGI,1,0,0,12.5,6.94,0.5,6.94,3.2,7.0";
+            "cs2.exe,1234,0xABCD,DXGI,1,0,0,12.5,6.94,0.5,6.94,3.2,7.0";
 
         Assert.True(parser.TryParseLine(row, out var sample, out var app));
-        Assert.Equal("RustClient.exe", app);
+        Assert.Equal("cs2.exe", app);
         Assert.NotNull(sample);
         Assert.Equal(6.94, sample!.FrameTimeMs, 3);
         Assert.Equal(12.5, sample.TimeInSeconds, 3);
@@ -41,10 +41,10 @@ public class PresentMonCsvParserTests
         Assert.True(parser.CanProduceFrameTimes);
 
         const string row =
-            "RustClient.exe,1234,0xABCD,DXGI,1,0,1,Hardware,3.5,8.33,0";
+            "cs2.exe,1234,0xABCD,DXGI,1,0,1,Hardware,3.5,8.33,0";
 
         Assert.True(parser.TryParseLine(row, out var sample, out var app));
-        Assert.Equal("RustClient.exe", app);
+        Assert.Equal("cs2.exe", app);
         Assert.Equal(8.33, sample!.FrameTimeMs, 3);
         Assert.Equal(3.5, sample.TimeInSeconds, 3);
     }
@@ -54,7 +54,7 @@ public class PresentMonCsvParserTests
     {
         var parser = new PresentMonCsvParser();
         parser.SetHeader("Application,Dropped,msBetweenPresents");
-        Assert.True(parser.TryParseLine("RustClient.exe,1,16.6", out var s, out _));
+        Assert.True(parser.TryParseLine("cs2.exe,1,16.6", out var s, out _));
         Assert.True(s!.Dropped);
     }
 
@@ -72,7 +72,7 @@ public class PresentMonCsvParserTests
     {
         var parser = new PresentMonCsvParser();
         parser.SetHeader("Application,Dropped,msBetweenPresents");
-        Assert.True(parser.TryParseLine("RustClient.exe,0,16.6", out _, out _));
+        Assert.True(parser.TryParseLine("cs2.exe,0,16.6", out _, out _));
         // PresentMon can re-emit the header if the session restarts.
         Assert.False(parser.TryParseLine("Application,Dropped,msBetweenPresents", out _, out _));
     }
@@ -82,7 +82,7 @@ public class PresentMonCsvParserTests
     {
         var parser = new PresentMonCsvParser();
         parser.SetHeader("Application,Dropped,msBetweenPresents");
-        Assert.False(parser.TryParseLine("RustClient.exe,0,N/A", out var s, out _));
+        Assert.False(parser.TryParseLine("cs2.exe,0,N/A", out var s, out _));
         Assert.Null(s);
     }
 
