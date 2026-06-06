@@ -1,0 +1,291 @@
+<Window x:Class="RigMetrics.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctl="clr-namespace:RigMetrics.App.Controls"
+        Title="RigMetrics" Height="760" Width="1000"
+        MinHeight="600" MinWidth="860"
+        Background="{StaticResource BgBrush}"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ===== Top control bar ===== -->
+        <Border Grid.Row="0" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="RIGMETRICS" FontSize="16" FontWeight="Bold"
+                               Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock x:Name="StatusText" Style="{StaticResource StatLabel}"
+                               Text="Idle. Pick a game, enter a label, press Start." />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Vertical" Margin="20,0,0,0"
+                            VerticalAlignment="Center" Width="200">
+                    <TextBlock Text="GAME (process to track)" Style="{StaticResource StatLabel}" />
+                    <ComboBox x:Name="TargetCombo" Margin="0,2,0,0" IsEditable="True"
+                              DropDownOpened="TargetCombo_DropDownOpened"
+                              ToolTip="Choose a running game, or type its .exe name (e.g. cs2.exe)." />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Vertical" Margin="16,0"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="SESSION LABEL (e.g. 'Shadows Low, AA Off')"
+                               Style="{StaticResource StatLabel}" />
+                    <TextBox x:Name="LabelBox" Margin="0,2,0,0" Padding="6,4"
+                             Background="#FF1A1B20" Foreground="{StaticResource TextBrush}"
+                             BorderBrush="#FF3A3C44" />
+                </StackPanel>
+
+                <CheckBox x:Name="TopmostCheck" Grid.Column="3" Content="Always on top"
+                          Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"
+                          Margin="0,0,16,0" Checked="TopmostCheck_Changed"
+                          Unchecked="TopmostCheck_Changed" />
+
+                <Button x:Name="StartStopButton" Grid.Column="4" Content="Start"
+                        MinWidth="110" Click="StartStopButton_Click" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <!-- ===== Live FPS stat tiles ===== -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.4*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="CURRENT FPS" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="CurrentFpsText" Text="--" FontSize="48" FontWeight="Bold"
+                               Foreground="{StaticResource GoodBrush}" />
+                    <TextBlock x:Name="ElapsedText" Style="{StaticResource StatLabel}" Text="00:00" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="AVG FPS" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="AvgFpsText" Text="--" Style="{StaticResource StatValue}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="1% LOW" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="Low1Text" Text="--" Style="{StaticResource StatValue}"
+                               Foreground="{StaticResource WarnBrush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="0.1% LOW" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="Low01Text" Text="--" Style="{StaticResource StatValue}"
+                               Foreground="{StaticResource WarnBrush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="FRAME TIME" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="FrameTimeText" Text="--" Style="{StaticResource StatValue}" />
+                    <TextBlock x:Name="FrameCountText" Style="{StaticResource StatLabel}" Text="0 frames" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="5" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="CPU TEMP" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="CpuTempTileText" Text="--" Style="{StaticResource StatValue}"
+                               Foreground="{StaticResource GoodBrush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="6" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="GPU TEMP" Style="{StaticResource StatLabel}" />
+                    <TextBlock x:Name="GpuTempTileText" Text="--" Style="{StaticResource StatValue}"
+                               Foreground="{StaticResource GoodBrush}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ===== Graphs + hardware ===== -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Graphs -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="FPS (rolling window)" Style="{StaticResource StatLabel}" />
+                        <ctl:Sparkline x:Name="FpsSpark" Grid.Row="1" Margin="0,6,0,0" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Frame time (ms) - flatter is smoother"
+                                   Style="{StaticResource StatLabel}" />
+                        <ctl:Sparkline x:Name="FrameTimeSpark" Grid.Row="1" Margin="0,6,0,0" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Hardware -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="CPU" Style="{StaticResource StatLabel}" />
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock x:Name="CpuLoadText" Text="-- %" FontSize="20" FontWeight="Bold" />
+                            <TextBlock Text="   " />
+                            <TextBlock x:Name="CpuTempText" Text="-- C" FontSize="20" FontWeight="Bold"
+                                       Foreground="{StaticResource WarnBrush}" />
+                        </StackPanel>
+                        <ctl:Sparkline x:Name="CpuTempSpark" Grid.Row="2" Margin="0,6,0,0"
+                                       Stroke="#FFE0A030" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="GPU" Style="{StaticResource StatLabel}" />
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock x:Name="GpuLoadText" Text="-- %" FontSize="20" FontWeight="Bold" />
+                            <TextBlock Text="   " />
+                            <TextBlock x:Name="GpuTempText" Text="-- C" FontSize="20" FontWeight="Bold"
+                                       Foreground="{StaticResource WarnBrush}" />
+                        </StackPanel>
+                        <TextBlock x:Name="GpuMemText" Grid.Row="2" Style="{StaticResource StatLabel}"
+                                   Text="VRAM: -- MB" />
+                        <ctl:Sparkline x:Name="GpuTempSpark" Grid.Row="3" Margin="0,6,0,0"
+                                       Stroke="#FF4CC2FF" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="2" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="MEMORY" Style="{StaticResource StatLabel}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock x:Name="RamUsedText" Text="-- GB" FontSize="20" FontWeight="Bold" />
+                            <TextBlock Text="   " />
+                            <TextBlock x:Name="RamLoadText" Text="-- %" FontSize="20" FontWeight="Bold"
+                                       Foreground="{StaticResource MutedBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- ===== Saved sessions ===== -->
+        <Border Grid.Row="3" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,6">
+                    <TextBlock DockPanel.Dock="Left" Text="SAVED SESSIONS (select two to compare)"
+                               Style="{StaticResource StatLabel}" VerticalAlignment="Center" />
+                    <Button DockPanel.Dock="Right" Content="Open folder" Margin="6,0,0,0"
+                            Background="#FF3A3C44" Foreground="{StaticResource TextBrush}"
+                            Click="OpenFolder_Click" />
+                    <Button DockPanel.Dock="Right" Content="Delete" Margin="6,0,0,0"
+                            Background="#FF7A3030" Foreground="{StaticResource TextBrush}"
+                            Click="Delete_Click" />
+                    <Button DockPanel.Dock="Right" Content="Export report" Margin="6,0,0,0"
+                            Background="#FF3A3C44" Foreground="{StaticResource TextBrush}"
+                            Click="ExportReport_Click" />
+                    <Button DockPanel.Dock="Right" Content="Compare 2" Margin="6,0,0,0"
+                            Click="Compare_Click" />
+                    <Button DockPanel.Dock="Right" Content="Results / Sheets" Margin="6,0,0,0"
+                            Background="{StaticResource GoodBrush}" Foreground="#FF12131A"
+                            Click="Results_Click" />
+                </DockPanel>
+
+                <ListBox x:Name="SessionsList" Grid.Row="1" Height="130"
+                         SelectionMode="Extended"
+                         Background="#FF1A1B20" BorderBrush="#FF3A3C44"
+                         Foreground="{StaticResource TextBrush}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Label}" FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="1" Margin="10,0"
+                                           Text="{Binding StartedUtc, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                           Foreground="{StaticResource MutedBrush}" />
+                                <TextBlock Grid.Column="2" Margin="10,0"
+                                           Text="{Binding Stats.AvgFps, StringFormat='avg {0:0.0}'}"
+                                           Foreground="{StaticResource GoodBrush}" />
+                                <TextBlock Grid.Column="3" Margin="10,0"
+                                           Text="{Binding Stats.Percentile1LowFps, StringFormat='1% low {0:0.0}'}"
+                                           Foreground="{StaticResource WarnBrush}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

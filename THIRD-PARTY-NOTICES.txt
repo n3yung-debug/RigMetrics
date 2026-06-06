@@ -1,0 +1,26 @@
+RigMetrics - Third-Party Notices
+======================================
+
+This application bundles and/or depends on the following third-party
+components. Each remains under its own license; please refer to the upstream
+projects for the full license texts.
+
+1. Intel PresentMon
+   - Purpose: captures frame-presentation timings via ETW (used for FPS).
+   - Project: https://github.com/GameTechDev/PresentMon
+   - License: MIT License (Copyright (c) Intel Corporation).
+   - The PresentMon.exe binary distributed alongside this app is the
+     unmodified official release downloaded from the project's GitHub
+     Releases page.
+
+2. LibreHardwareMonitor (LibreHardwareMonitorLib)
+   - Purpose: reads CPU/GPU/RAM load and temperatures.
+   - Project: https://github.com/LibreHardwareMonitor/LibreHardwareMonitor
+   - License: Mozilla Public License 2.0 (MPL-2.0).
+
+3. .NET Runtime / WPF (Microsoft)
+   - Purpose: application runtime and UI framework.
+   - Project: https://github.com/dotnet
+   - License: MIT License.
+
+If you redistribute this application, keep this notice with it.

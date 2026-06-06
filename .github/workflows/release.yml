@@ -1,0 +1,80 @@
+name: release
+
+# Builds a ready-to-run, self-contained Windows package that bundles the app
+# AND PresentMon, so end users just unzip and run (no .NET install, no separate
+# PresentMon download).
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version tag (e.g. v1.0.0)"
+        required: true
+        default: "v1.0.0"
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Test
+        run: dotnet test tests/RigMetrics.Core.Tests/RigMetrics.Core.Tests.csproj -c Release
+
+      - name: Publish self-contained single-file app
+        run: >
+          dotnet publish src/RigMetrics.App/RigMetrics.App.csproj
+          -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true
+          -o publish
+
+      - name: Download and bundle PresentMon
+        shell: pwsh
+        run: |
+          $headers = @{ 'User-Agent' = 'rigmetrics-ci' }
+          $rel = Invoke-RestMethod -Uri 'https://api.github.com/repos/GameTechDev/PresentMon/releases/latest' -Headers $headers
+          $asset = $rel.assets |
+            Where-Object { $_.name -match '^PresentMon.*x64.*\.exe$' -and $_.name -notmatch 'arm' } |
+            Select-Object -First 1
+          if (-not $asset) { Write-Error 'Could not find an x64 PresentMon .exe asset.'; exit 1 }
+          Write-Host "Bundling $($asset.name) ($($rel.tag_name))"
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile 'publish/PresentMon.exe' -Headers $headers
+
+      - name: Stage docs
+        shell: pwsh
+        run: |
+          Copy-Item README.md publish/ -Force
+          Copy-Item THIRD-PARTY-NOTICES.txt publish/ -Force
+
+      - name: Create ZIP
+        shell: pwsh
+        run: Compress-Archive -Path publish/* -DestinationPath RigMetrics-win-x64.zip -Force
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RigMetrics-win-x64
+          path: RigMetrics-win-x64.zip
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # On a tag push use the pushed tag; on manual run use the version input.
+          # When the tag does not exist yet, the action creates it at this commit.
+          tag_name: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+          name: RigMetrics ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+          files: RigMetrics-win-x64.zip
+          generate_release_notes: true
